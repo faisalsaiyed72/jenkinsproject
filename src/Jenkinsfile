@@ -3,11 +3,6 @@ pipeline {
         label "devops"
     }
     stages{
-        stage("Code Checkout"){
-            steps {
-                git url:"https://github.com/faisalsaiyed12/jenkinsproject.git", branch: "main"
-            }
-        }
         stage("build Docker Image"){
             steps {
                 sh "docker build -t myphpimg ."
