@@ -10,7 +10,7 @@ pipeline {
         }
         stage("build Docker Image"){
             steps {
-                sh "docker build -t myphpimg"
+                sh "docker build -t myphpimg ."
             }
         }
         stage("Image Push"){
