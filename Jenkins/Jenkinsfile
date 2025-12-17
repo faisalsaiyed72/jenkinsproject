@@ -1,33 +1,24 @@
 pipeline {
-    agent { label 'devops' }
-
-    stages {
-        stage('Build Docker Image') {
+    agent {
+        label "devops"
+    }
+    stages{
+        stage("Code Checkout"){
             steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'dockercreds',
-                    usernameVariable: 'docker_user',
-                    passwordVariable: 'docker_pass'
-                )]) {
-                    sh '''
-                        docker build -t ${docker_user}/static:${BUILD_NUMBER} .
-                    '''
-                }
+                git url:"https://github.com/faisalsaiyed12/jenkinsproject.git", branch: "main"
             }
         }
-
-        stage('Push Image') {
+        stage("build Docker Image"){
             steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'dockercreds',
-                    usernameVariable: 'docker_user',
-                    passwordVariable: 'docker_pass'
-                )]) {
-                    sh '''
-                        set -e
-                        echo "$docker_pass" | docker login -u "$docker_user" --password-stdin
-                        docker push ${docker_user}/static:${BUILD_NUMBER}
-                    '''
+                sh "docker build -t myphpimg"
+            }
+        }
+        stage("Image Push"){
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockercreds',usernameVariable: 'docker_user', passwordVariable: 'docker_pass')]){
+                    sh "docker tag static ${env.docker_user}/static:${BUILD_NUMBER}"
+                    sh "docker login -u ${env.docker_user} -p ${env.docker_pass}"
+                    sh "docker push ${env.docker_user}/static:${BUILD_NUMBER}" 
                 }
             }
         }
